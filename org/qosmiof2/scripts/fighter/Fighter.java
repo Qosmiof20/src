@@ -63,7 +63,8 @@ public class Fighter extends PollingScript<ClientContext> implements
 				+ (s < 10 ? "0" + s : s);
 	}
 
-	private final Font font = new Font("Arial", 1, 15);
+	private final Font font = new Font("Arial", 1, 13);
+	private final Color color = new Color(0, 0, 0, 180);
 
 	private int startExp, exp, expNow, kills;
 	private int killsPerHour, expPerHour, expGained;
@@ -74,8 +75,8 @@ public class Fighter extends PollingScript<ClientContext> implements
 				+ ctx.skills.experience(Skills.ATTACK)
 				+ ctx.skills.experience(Skills.DEFENSE)
 				+ ctx.skills.experience(Skills.STRENGTH)
-				+ ctx.skills.experience(Skills.RANGE) 
-				+ ctx.skills.experience(Skills.MAGIC));
+				+ ctx.skills.experience(Skills.RANGE) + ctx.skills
+				.experience(Skills.MAGIC));
 		expGained = (expNow - startExp);
 		killsPerHour = ((int) ((kills) * 3600000D / (ctx.controller.script()
 				.getTotalRuntime())));
@@ -89,7 +90,7 @@ public class Fighter extends PollingScript<ClientContext> implements
 		}
 		Graphics2D g = (Graphics2D) g1;
 
-		g.setColor(Color.BLACK);
+		g.setColor(color);
 		g.fillRect(5, 5, 200, 130);
 
 		g.setColor(Color.WHITE);
