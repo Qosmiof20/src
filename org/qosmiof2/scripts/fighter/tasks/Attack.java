@@ -2,6 +2,7 @@ package org.qosmiof2.scripts.fighter.tasks;
 
 import org.powerbot.script.Condition;
 import org.powerbot.script.Filter;
+import org.powerbot.script.Random;
 import org.powerbot.script.rt6.ClientContext;
 import org.powerbot.script.rt6.Npc;
 import org.qosmiof2.scripts.fighter.gui.Gui;
@@ -27,18 +28,15 @@ public class Attack extends Node {
 	@Override
 	public boolean activate() {
 
-		Npc npc = ctx.npcs.select().select(filter).name(Gui.npcs).nearest()
-				.first().poll();
-
 		return !ctx.players.local().interacting().valid()
 				&& ctx.players.local().animation() == -1
-				&& !ctx.players.local().inMotion() && npc.valid();
+				&& !ctx.players.local().inMotion()
+				&& !ctx.npcs.select().select(filter).name(Gui.npcs).isEmpty();
 	}
 
 	@Override
 	public void execute() {
-		Npc npc = ctx.npcs.select().select(filter).name(Gui.npcs).nearest()
-				.first().poll();
+		Npc npc = ctx.npcs.nearest().first().poll();
 
 		if (npc.inViewport()) {
 
@@ -50,7 +48,17 @@ public class Attack extends Node {
 
 			}
 		} else {
-			ctx.camera.turnTo(npc);
+
+			switch (Random.nextInt(1, 10)) {
+			case 5:
+				ctx.camera.turnTo(npc);
+				ctx.camera.pitch(Random.nextInt(20, 84));
+				break;
+
+			default:
+				ctx.camera.turnTo(npc);
+				break;
+			}
 		}
 
 	}
