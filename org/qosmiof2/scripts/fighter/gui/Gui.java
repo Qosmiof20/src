@@ -31,6 +31,7 @@ import org.powerbot.script.rt6.Npc;
 import org.qosmiof2.scripts.fighter.Fighter;
 import org.qosmiof2.scripts.fighter.tasks.Attack;
 import org.qosmiof2.scripts.fighter.tasks.Eat;
+import org.qosmiof2.scripts.fighter.tasks.MoveMouse;
 
 public class Gui extends ClientAccessor {
 
@@ -301,6 +302,7 @@ public class Gui extends ClientAccessor {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				Fighter.nodeList.add(new Attack(ctx));
+				Fighter.nodeList.add(new MoveMouse(ctx));
 				if (checkBoxEat.isSelected()) {
 					Fighter.nodeList.add(new Eat(ctx));
 				}
