@@ -59,6 +59,10 @@ public class Attack extends Node {
 				ctx.camera.turnTo(npc);
 				break;
 			}
+			
+			if(!npc.inViewport()){
+				ctx.movement.step(npc);
+			}
 		}
 
 	}
