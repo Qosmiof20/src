@@ -25,7 +25,7 @@ public class Eat extends Node {
 
 	@Override
 	public void execute() {
-		Item item = ctx.backpack.shuffle().poll();
+		Item item = ctx.backpack.name(gui.getSelectedFood()).shuffle().poll();
 
 		if (item.interact("Eat", gui.getSelectedFood())) {
 			Condition.wait(new Callable<Boolean>() {

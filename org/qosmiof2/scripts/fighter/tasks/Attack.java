@@ -5,6 +5,7 @@ import org.powerbot.script.Filter;
 import org.powerbot.script.Random;
 import org.powerbot.script.rt6.ClientContext;
 import org.powerbot.script.rt6.Npc;
+import org.qosmiof2.scripts.fighter.Fighter;
 import org.qosmiof2.scripts.fighter.gui.Gui;
 import org.qosmiof2.scripts.framework.Node;
 
@@ -30,17 +31,30 @@ public class Attack extends Node {
 
 	@Override
 	public boolean activate() {
+		
+		System.out.println(Fighter.nodeList.contains(new Loot(ctx, gui)));
 
 		return !ctx.players.local().interacting().valid()
 				&& ctx.players.local().animation() == -1
 				&& !ctx.npcs.select().select(filter).name(gui.getNpcs())
-						.within(10).isEmpty();
+						.isEmpty();
 	}
 
 	@Override
 	public void execute() {
-		Npc npc = ctx.npcs.nearest().first().poll();
 
+		if (Fighter.nodeList.contains(new Loot(ctx, gui))) {
+			Npc npc = ctx.npcs.nearest().within(10).first().poll();
+			interact(npc);
+		} else {
+			Npc npc = ctx.npcs.nearest().first().poll();
+			interact(npc);
+
+		}
+
+	}
+
+	private void interact(Npc npc) {
 		if (npc.inViewport()) {
 
 			if (npc.interact("Attack")) {
@@ -67,6 +81,5 @@ public class Attack extends Node {
 				ctx.movement.step(npc);
 			}
 		}
-
 	}
 }
