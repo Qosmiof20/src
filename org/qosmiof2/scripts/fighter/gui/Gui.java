@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -20,17 +22,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.powerbot.script.rt6.ClientAccessor;
 import org.powerbot.script.rt6.ClientContext;
+import org.powerbot.script.rt6.GroundItem;
 import org.powerbot.script.rt6.Item;
 import org.powerbot.script.rt6.Npc;
 import org.qosmiof2.scripts.fighter.Fighter;
 import org.qosmiof2.scripts.fighter.tasks.Attack;
 import org.qosmiof2.scripts.fighter.tasks.Eat;
+import org.qosmiof2.scripts.fighter.tasks.Loot;
 import org.qosmiof2.scripts.fighter.tasks.MoveMouse;
 
 public class Gui extends ClientAccessor {
@@ -57,24 +62,41 @@ public class Gui extends ClientAccessor {
 	private JPanel eatPanel = new JPanel();
 	private JPanel startPanel = new JPanel();
 	private JLabel labelNpc, labelFood, labelHealth;
-	public static double percent;
+	public double percent;
 	private String selected;
-	public static String selectedFood;
-	public static String[] npcs;
+	public String selectedFood;
+	public String[] npcs;
 	private JCheckBox checkBoxEat = new JCheckBox("Eat food");
 	private SpinnerNumberModel spinnerModel = new SpinnerNumberModel(99.0,
 			10.0, 99.0, 1.0);
 	private JSpinner spinnerPercent = new JSpinner(spinnerModel);
 	private JButton startButton = new JButton("Start");
-	public static ArrayList<String> npcToAttack = new ArrayList<>();
+	public ArrayList<String> npcToAttack = new ArrayList<>();
 	private DefaultListModel<String> npcsToAttackModel = new DefaultListModel<>();
 	private JList<String> npcsToAttackList = new JList<>(npcsToAttackModel);
 	private JScrollPane npcsToAttackPane = new JScrollPane(npcsToAttackList);
 	private JButton addButton = new JButton("Add");
 
+	private JPanel panelLoot = new JPanel();
+	private DefaultListModel<String> lootModel = new DefaultListModel<>();
+	private DefaultListModel<String> lootSelectedModel = new DefaultListModel<>();
+	private JList<String> lootList = new JList<>(lootModel);
+	private JList<String> lootListSelected = new JList<>(lootSelectedModel);
+	private JScrollPane lootPane = new JScrollPane(lootList);
+	private JScrollPane lootPaneSelected = new JScrollPane(lootListSelected);
+	private JButton buttonAdd = new JButton("Add");
+	private JButton buttonRefresh = new JButton("Refresh");
+	private ArrayList<String> lootListArray = new ArrayList<>();
+	private ArrayList<String> lootListSelectedArray = new ArrayList<>();
+	private JLabel labelLoot, labelLootSelected;
+	private String selectedLoot;
+	private String[] lootSelected;
+	private JTextField lootName = new JTextField("Loot name");
+
 	private void init() {
 
 		ctx.input.blocking(false);
+		lootPanel();
 		panel();
 		eatPanel();
 		startPanel();
@@ -88,6 +110,7 @@ public class Gui extends ClientAccessor {
 		tabbedPane.setFocusable(false);
 		tabbedPane.add("Target", panel);
 		tabbedPane.add("Food", eatPanel);
+		tabbedPane.add("Loot", panelLoot);
 		tabbedPane.add("Start", startPanel);
 
 		tabbedPane.addMouseListener(new MouseAdapter() {
@@ -145,8 +168,6 @@ public class Gui extends ClientAccessor {
 				for (String listString : listNpc) {
 					model.addElement(listString);
 				}
-
-				System.out.println(listNpc);
 				selected = "null";
 			}
 
@@ -157,8 +178,6 @@ public class Gui extends ClientAccessor {
 			@Override
 			public void mouseClicked(MouseEvent arg1) {
 				selected = list.getSelectedValue();
-
-				System.out.println(selected);
 			}
 		});
 
@@ -167,7 +186,7 @@ public class Gui extends ClientAccessor {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				if (!npcToAttack.contains(selected)) {
+				if (!npcToAttack.contains(selected) && !selected.equals(null)) {
 					npcToAttack.add(selected);
 				}
 
@@ -240,8 +259,6 @@ public class Gui extends ClientAccessor {
 			public void mouseClicked(MouseEvent arg0) {
 				selectedFood = listEat.getSelectedValue();
 
-				System.out.println(selectedFood);
-
 			}
 
 		});
@@ -271,10 +288,17 @@ public class Gui extends ClientAccessor {
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				percent = (double) spinnerPercent.getValue();
-				System.out.println(percent);
 
 			}
 
+		});
+
+		spinnerPercent.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent kEvent) {
+				percent = (double) spinnerPercent.getValue();
+			}
 		});
 	}
 
@@ -282,17 +306,20 @@ public class Gui extends ClientAccessor {
 
 		labelNpc = new JLabel("Selected target: ");
 		labelFood = new JLabel("Selected food: ");
+		labelLootSelected = new JLabel("Selected loot: ");
 		labelHealth = new JLabel("Health percent: ");
 
 		startPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		startPanel.add(labelNpc);
 		startPanel.add(labelFood);
+		startPanel.add(labelLootSelected);
 		startPanel.add(labelHealth);
 		startPanel.add(startButton);
 
-		labelNpc.setPreferredSize(new Dimension(200, 20));
-		labelFood.setPreferredSize(new Dimension(200, 20));
-		labelHealth.setPreferredSize(new Dimension(200, 20));
+		labelNpc.setPreferredSize(new Dimension(300, 20));
+		labelFood.setPreferredSize(new Dimension(300, 20));
+		labelHealth.setPreferredSize(new Dimension(300, 20));
+		labelLootSelected.setPreferredSize(new Dimension(300, 20));
 
 		startButton.setPreferredSize(new Dimension(100, 30));
 		startButton.setFocusable(false);
@@ -301,14 +328,21 @@ public class Gui extends ClientAccessor {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Fighter.nodeList.add(new Attack(ctx));
+				npcs = npcToAttack.toArray(new String[npcToAttack.size()]);
+				lootSelected = lootListSelectedArray
+						.toArray(new String[lootListSelectedArray.size()]);
+				Fighter.nodeList.add(new Attack(ctx, Gui.this));
 				Fighter.nodeList.add(new MoveMouse(ctx));
 				if (checkBoxEat.isSelected()) {
-					Fighter.nodeList.add(new Eat(ctx));
+					Fighter.nodeList.add(new Eat(ctx, Gui.this));
 				}
-				npcs = npcToAttack.toArray(new String[npcToAttack.size()]);
+				if (lootSelected.length != 0) {
+					Fighter.nodeList.add(new Loot(ctx, Gui.this));
+				}
+				System.out.println(lootSelected.length);
 				frame.dispose();
 				ctx.input.blocking(true);
+
 			}
 
 		});
@@ -322,6 +356,112 @@ public class Gui extends ClientAccessor {
 		} else {
 			labelFood.setText("Selected food: Not going to eat.");
 		}
+		labelLootSelected.setText("Selected loot: " + lootListSelectedArray);
 		labelHealth.setText("Health percent: " + percent + ".");
 	}
+
+	private void lootPanel() {
+		labelLoot = new JLabel("Please select loot:");
+
+		panelLoot.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panelLoot.add(labelLoot);
+		panelLoot.add(lootName);
+		panelLoot.add(lootPane);
+		panelLoot.add(lootPaneSelected);
+		panelLoot.add(buttonRefresh);
+		panelLoot.add(Box.createRigidArea(new Dimension(20, 0)));
+		panelLoot.add(buttonAdd);
+
+		labelLoot.setPreferredSize(new Dimension(100, 20));
+		lootName.setPreferredSize(new Dimension(100, 20));
+
+		buttonAdd.setPreferredSize(new Dimension(80, 30));
+		buttonAdd.setFocusable(false);
+
+		lootPaneSelected.setPreferredSize(new Dimension(100, 120));
+		lootPaneSelected.setEnabled(false);
+		lootPaneSelected.setBorder(BorderFactory.createEtchedBorder());
+		lootPaneSelected.setFocusable(false);
+
+		lootListSelected.setEnabled(false);
+		lootPane.setPreferredSize(new Dimension(100, 120));
+		lootPane.setBorder(BorderFactory.createEtchedBorder());
+		lootPane.setFocusable(false);
+
+		buttonRefresh.setPreferredSize(new Dimension(80, 30));
+		buttonRefresh.setFocusable(false);
+
+		buttonRefresh.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				lootListArray.clear();
+				lootModel.clear();
+				for (GroundItem item : ctx.groundItems.select()) {
+					if (!lootListArray.contains(item.name())) {
+						lootListArray.add(item.name());
+					}
+				}
+
+				for (String listString : lootListArray) {
+					lootModel.addElement(listString);
+				}
+			}
+
+		});
+
+		lootList.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg1) {
+				selectedLoot = lootList.getSelectedValue();
+			}
+		});
+
+		buttonAdd.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				if (!lootListSelectedArray.contains(selectedLoot)) {
+					lootListSelectedArray.add(selectedLoot);
+				}
+
+				if (!lootListSelectedArray.contains(lootName.getText())
+						&& !lootName.getText().equals("Loot name")
+						&& !lootName.getText().equals("")) {
+					lootListSelectedArray.add(lootName.getText());
+					lootSelectedModel.addElement(lootName.getText());
+				}
+
+				for (String string : lootListSelectedArray) {
+					if (!lootSelectedModel.contains(string)) {
+						lootSelectedModel.addElement(string);
+					}
+
+				}
+
+			}
+
+		});
+
+	}
+
+	public double getPercent() {
+		return percent;
+	}
+
+	public String[] getNpcs() {
+		return npcToAttack.toArray(new String[npcToAttack.size()]);
+	}
+
+	public String[] getLootSelected() {
+		return lootListSelectedArray.toArray(new String[lootListSelectedArray
+				.size()]);
+	}
+
+	public String getSelectedFood() {
+		return selectedFood;
+	}
+
 }

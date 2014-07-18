@@ -18,8 +18,17 @@ public class MoveMouse extends Node {
 
 	@Override
 	public void execute() {
-		ctx.mouse.move(Random.nextInt(0, 800), Random.nextInt(0, 600));
-		Condition.sleep(Random.nextInt(500, 1000));
+		switch (Random.nextInt(1, 10)) {
+
+		case 6:
+			ctx.mouse.move(Random.nextInt(0, 800), Random.nextInt(0, 600));
+			Condition.sleep(Random.nextInt(500, 1000));
+			break;
+
+		default:
+			Condition.sleep(Random.nextInt(500, 1000));
+			break;
+		}
 
 	}
 

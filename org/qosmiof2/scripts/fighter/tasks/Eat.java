@@ -10,26 +10,30 @@ import org.qosmiof2.scripts.framework.Node;
 
 public class Eat extends Node {
 
-	public Eat(ClientContext ctx) {
+	private Gui gui;
+
+	public Eat(ClientContext ctx, Gui gui) {
 		super(ctx);
+		this.gui = gui;
 	}
 
 	@Override
 	public boolean activate() {
-		return ctx.players.local().healthPercent() <= Gui.percent
-				&& !ctx.backpack.select().name(Gui.selectedFood).isEmpty();
+		return ctx.players.local().healthPercent() <= gui.getPercent()
+				&& !ctx.backpack.select().name(gui.getSelectedFood()).isEmpty();
 	}
 
 	@Override
 	public void execute() {
-		Item item = ctx.backpack.name(Gui.selectedFood).shuffle().poll();
+		Item item = ctx.backpack.shuffle().poll();
 
-		if (item.interact("Eat", Gui.selectedFood)) {
+		if (item.interact("Eat", gui.getSelectedFood())) {
 			Condition.wait(new Callable<Boolean>() {
 
 				@Override
 				public Boolean call() throws Exception {
-					return ctx.players.local().healthPercent() > Gui.percent;
+					return ctx.players.local().healthPercent() > gui
+							.getPercent();
 				}
 
 			}, 500, 5);
