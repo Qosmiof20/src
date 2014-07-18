@@ -62,16 +62,16 @@ public class Gui extends ClientAccessor {
 	private JPanel eatPanel = new JPanel();
 	private JPanel startPanel = new JPanel();
 	private JLabel labelNpc, labelFood, labelHealth;
-	public double percent;
+	private double percent;
 	private String selected;
-	public String selectedFood;
-	public String[] npcs;
+	private String selectedFood;
+	private String[] npcs;
 	private JCheckBox checkBoxEat = new JCheckBox("Eat food");
 	private SpinnerNumberModel spinnerModel = new SpinnerNumberModel(99.0,
 			10.0, 99.0, 1.0);
 	private JSpinner spinnerPercent = new JSpinner(spinnerModel);
 	private JButton startButton = new JButton("Start");
-	public ArrayList<String> npcToAttack = new ArrayList<>();
+	private ArrayList<String> npcToAttack = new ArrayList<>();
 	private DefaultListModel<String> npcsToAttackModel = new DefaultListModel<>();
 	private JList<String> npcsToAttackList = new JList<>(npcsToAttackModel);
 	private JScrollPane npcsToAttackPane = new JScrollPane(npcsToAttackList);
