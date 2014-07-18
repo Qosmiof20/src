@@ -35,11 +35,11 @@ public class Loot extends Node {
 		return !ctx.players.local().interacting().valid()
 				&& ctx.players.local().animation() == -1
 				&& !ctx.players.local().inMotion()
-				&& !ctx.groundItems.select().name(gui.getLootSelected())
+				&& !ctx.groundItems.select().name(gui.getLootSelected()).within(10)
 						.isEmpty()
-				&& ctx.backpack.select().count() < 28
-				&& ctx.npcs.select().select(filter).name(gui.getNpcs()).within(1)
-						.isEmpty();
+				&& ctx.npcs.select().select(filter).name(gui.getNpcs())
+						.within(10).isEmpty()
+				&& ctx.backpack.select().count() < 28;
 	}
 
 	@Override

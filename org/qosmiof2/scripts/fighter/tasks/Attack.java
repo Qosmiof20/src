@@ -34,9 +34,7 @@ public class Attack extends Node {
 		return !ctx.players.local().interacting().valid()
 				&& ctx.players.local().animation() == -1
 				&& !ctx.npcs.select().select(filter).name(gui.getNpcs())
-						.isEmpty()
-				&& ctx.groundItems.select().name(gui.getLootSelected())
-						.within(5).isEmpty();
+						.within(10).isEmpty();
 	}
 
 	@Override
